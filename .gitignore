@@ -1,4 +1,5 @@
 .env
 minio/*
 postgres/*
-*-checkpoint.ipynb
+*-checkpoint.*
+*.pyc

@@ -1,7 +1,20 @@
 FROM jupyter/base-notebook:latest
 
 USER root
-RUN apt-get update && apt-get install -y g++ && apt-get clean
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    g++ \
+    cmake \
+    libblas-dev \
+    liblapack-dev \
+    libatlas-base-dev \
+    python3-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    wget \
+    unzip \
+    && apt-get clean
 
 RUN pip install mlflow \
     && pip install scikit-learn \
