@@ -21,7 +21,8 @@ RUN pip install mlflow \
     && pip install matplotlib \
     && pip install IProgress \
     && pip install ipywidgets \
-    && pip install cmdstanpy
+    && pip install cmdstanpy \
+    && pip install boto3
 
 RUN python -c "from cmdstanpy import install_cmdstan; install_cmdstan()"
 
