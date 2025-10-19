@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-init
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: minio-init
+          image: minio/mc
+          env:
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mlflow-secrets
+                  key: MINIO_ROOT_PASSWORD
+            - name: MINIO_MLFLOW_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mlflow-secrets
+                  key: MINIO_MLFLOW_PASSWORD
+          command:
+            - /bin/sh
+            - -c
+            - |
+              sleep 5 &&
+              mc alias set local http://minio:9000 admin $MINIO_ROOT_PASSWORD &&
+              mc mb -p local/mlflow-artifacts || true &&
+              mc admin user add local mlflow $MINIO_MLFLOW_PASSWORD || true &&
+              mc admin policy attach local readwrite --user=mlflow || true

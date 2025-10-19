@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notebook
+spec:
+  selector:
+    matchLabels:
+      app: notebook
+  template:
+    metadata:
+      labels:
+        app: notebook
+    spec:
+      containers:
+        - name: notebook
+          image: notebook:latest
+          imagePullPolicy: Never
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              value: mlflow
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: mlflow-secrets
+                  key: MINIO_MLFLOW_PASSWORD
+            - name: MLFLOW_S3_ENDPOINT_URL
+              value: http://minio:9000
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: notebook-code
+              mountPath: /notebook
+      volumes:
+        - name: notebook-code
+          persistentVolumeClaim:
+            claimName: notebook-pvc
