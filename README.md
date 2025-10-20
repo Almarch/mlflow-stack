@@ -20,7 +20,14 @@ sudo apt-get update && sudo apt-get install -y docker.io
 The k8s instance may then be turned on and off:
 
 ```sh
-minikube start -p my-mlflow --driver=docker --memory=6144 --cpus=4 --disk-size=50g
+minikube start -p my-mlflow \
+    --driver=docker \
+    --memory=6144 \
+    --cpus=4 \
+    --disk-size=50g \
+    --mount \
+    --mount-string="$(pwd)/notebook:/mnt/data/notebook"
+
 minikube stop -p my-mlflow
 minikube start -p my-mlflow
 ```
@@ -33,7 +40,7 @@ echo "MINIO_ROOT_PASSWORD=$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head 
 echo "MINIO_MLFLOW_PASSWORD=$(openssl rand -base64 24 | tr -dc 'A-Za-z0-9' | head -c 16)" >> .env
 ```
 
-And translate them to k8s:
+And forward them to k8s:
 
 ```sh
 kubectl create secret generic mlflow-secrets \
@@ -47,8 +54,6 @@ Ingress needs to be activated:
 ```sh
 minikube addons enable ingress -p my-mlflow
 ```
-
-Build the notebook & mlflow images and load them.
 
 MLflow is light enough and can be built locally then pushed to the cluster:
 
@@ -74,8 +79,23 @@ kubectl apply -f k8s/mlflow
 kubectl apply -f k8s/notebook
 ```
 
-As this is configured for local deployment, a tunnel is needed:
+The host must allow access to the dedicated services:
 
 ```sh
-minikube tunnel -p my-mlflow
+IP=$(minikube ip -p my-mlflow)
+echo $IP
+sudo sh -c "echo \"$IP mlflow.local notebook.local\" >> /etc/hosts"
+tail -n 2 /etc/hosts
+```
+
+If using the WSL2, you may need to install & use a browser from the WSL so that it properly uses /etc/hosts declaration:
+
+```sh
+firefox http://notebook.local/
+```
+
+The cluster may then be monitored using k9s:
+
+```sh
+k9s
 ```

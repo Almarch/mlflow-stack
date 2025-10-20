@@ -6,12 +6,13 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - http:
-        paths:
-          - path: /notebook
-            pathType: Prefix
-            backend:
-              service:
-                name: notebook
-                port:
-                  number: 8080 
+  - host: notebook.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: notebook
+            port:
+              number: 8080

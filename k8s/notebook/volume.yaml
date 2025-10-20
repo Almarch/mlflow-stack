@@ -7,8 +7,9 @@ spec:
     storage: 1Gi
   accessModes:
     - ReadWriteOnce
+  storageClassName: nb
   hostPath:
-    path: /path/to/your/project/notebook
+    path: /mnt/data/notebook
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -17,6 +18,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
+  storageClassName: nb
   resources:
     requests:
       storage: 1Gi
